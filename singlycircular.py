@@ -3,52 +3,64 @@ class Node:
         self.data = data
         self.next = None
 
-class SinglyLinkedList:
+class CircularLinkedList:
     def __init__(self):
         self.head = None
 
-    # Insert a value at a specific position
+    # Insert at a specific position
     def insert(self, data, position):
-        new_node = Node(data)
-
         if position < 0:
             print("Invalid position")
             return
 
-        if position == 0:
+        new_node = Node(data)
+
+        if self.head is None:
+            if position != 0:
+                print("Position out of range")
+                return
+            self.head = new_node
             new_node.next = self.head
+            return
+
+        if position == 0:
+            current = self.head
+
+            while current.next != self.head:
+                current = current.next
+
+            new_node.next = self.head
+            current.next = new_node
             self.head = new_node
             return
 
         current = self.head
 
         for _ in range(position - 1):
-            if current is None:
+            current = current.next
+            if current == self.head:
                 print("Position out of range")
                 return
-            current = current.next
-
-        if current is None:
-            print("Position out of range")
-            return
 
         new_node.next = current.next
         current.next = new_node
 
-    # Append a value at the end
+    # Append at the end
     def append(self, data):
         new_node = Node(data)
 
         if self.head is None:
             self.head = new_node
+            new_node.next = self.head
             return
 
         current = self.head
 
-        while current.next is not None:
+        while current.next != self.head:
             current = current.next
 
         current.next = new_node
+        new_node.next = self.head
 
     # Delete a value
     def delete(self, data):
@@ -56,44 +68,69 @@ class SinglyLinkedList:
             print("List is empty")
             return
 
-        if self.head.data == data:
-            self.head = self.head.next
+        current = self.head
+        previous = None
+
+        while True:
+            if current.data == data:
+                # Only one node
+                if current.next == self.head and current == self.head:
+                    self.head = None
+                    return
+
+                # Delete the head node
+                if current == self.head:
+                    last = self.head
+
+                    while last.next != self.head:
+                        last = last.next
+
+                    self.head = self.head.next
+                    last.next = self.head
+                else:
+                    previous.next = current.next
+
+                return
+
+            previous = current
+            current = current.next
+
+            if current == self.head:
+                break
+
+        print("Value not found")
+
+    # Display the list
+    def display(self):
+        if self.head is None:
+            print("List is empty")
             return
 
         current = self.head
 
-        while current.next is not None:
-            if current.next.data == data:
-                current.next = current.next.next
-                return
-            current = current.next
-
-        print("Value not found")
-
-    # Display the linked list
-    def display(self):
-        current = self.head
-
-        while current is not None:
+        while True:
             print(current.data, end=" -> ")
             current = current.next
 
-        print("None")
+            if current == self.head:
+                break
+
+        print("(back to head)")
 
 # Main program
-ll = SinglyLinkedList()
+cll = CircularLinkedList()
 
-ll.append(10)
-ll.append(20)
-ll.append(30)
+cll.append(10)
+cll.append(20)
+cll.append(30)
 
 print("Original list:")
-ll.display()
+cll.display()
 
-ll.insert(15, 1)
-print("After inserting 15:")
-ll.display()
+cll.insert(15, 1)
+print("After inserting 15 at position 1:")
+cll.display()
 
-ll.delete(20)
+cll.delete(20)
 print("After deleting 20:")
-ll.display()
+cll.display()
